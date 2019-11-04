@@ -1,1 +1,1 @@
-module github.com/jgert/go-dash/v3
+module github.com/jgert/go-dash
