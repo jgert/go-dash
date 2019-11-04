@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/zencoder/go-dash/helpers/ptrs"
-	"github.com/zencoder/go-dash/helpers/require"
-	"github.com/zencoder/go-dash/helpers/testfixtures"
+	"github.com/jgert/go-dash/helpers/ptrs"
+	"github.com/jgert/go-dash/helpers/require"
+	"github.com/jgert/go-dash/helpers/testfixtures"
 )
 
 func TestSegmentTimelineSerialization(t *testing.T) {
