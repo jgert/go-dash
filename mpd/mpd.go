@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"errors"
+	"fmt"
+	"github.com/Comcast/gots/scte35"
 	"strings"
 	"time"
 
@@ -67,16 +69,44 @@ type MPD struct {
 	MinBufferTime             *string `xml:"minBufferTime,attr"`
 	AvailabilityStartTime     *string `xml:"availabilityStartTime,attr,omitempty"`
 	MinimumUpdatePeriod       *string `xml:"minimumUpdatePeriod,attr"`
+	MaxSegmentDuration        *string `xml:"maxSegmentDuration,attr"`
 	BaseURL                   string  `xml:"BaseURL,omitempty"`
+	PublishTime               *string `xml:"publishTime,attr,omitempty"`
+	ID                        *string `xml:"id,attr,omitempty"`
 	period                    *Period
 	Periods                   []*Period `xml:"Period,omitempty"`
+}
+
+type DateTime struct {
+	Time time.Time
+}
+
+func (d2 DateTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+
+	return e.EncodeElement(d2.Time.Format(time.RFC3339), start)
+}
+
+func (d2 DateTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var o string
+	if err := d.DecodeElement(&o, &start); err != nil {
+		return err
+	}
+	parse, err := time.Parse(time.RFC3339, o)
+	if err != nil {
+		return err
+	}
+
+	d2.Time = parse
+
+	return nil
 }
 
 type Period struct {
 	ID              string           `xml:"id,attr,omitempty"`
 	Duration        Duration         `xml:"duration,attr,omitempty"`
-	Start           Duration         `xml:"start,attr,omitempty"`
+	Start           Duration         `xml:"start,attr"`
 	BaseURL         string           `xml:"BaseURL,omitempty"`
+	EventStream     EventStream      `xml:"EventStream,omitempty"`
 	SegmentBase     *SegmentBase     `xml:"SegmentBase,omitempty"`
 	SegmentList     *SegmentList     `xml:"SegmentList,omitempty"`
 	SegmentTemplate *SegmentTemplate `xml:"SegmentTemplate,omitempty"`
@@ -84,9 +114,61 @@ type Period struct {
 }
 
 type DescriptorType struct {
-	SchemeIDURI *string `xml:"schemeIDURI,attr"`
+	SchemeIDURI *string `xml:"schemeIdUri,attr"`
 	Value       *string `xml:"value,attr"`
 	ID          *string `xml:"id,attr"`
+}
+
+type Event struct {
+	ID               string `xml:"id,attr"`
+	Duration         int64  `xml:"duration,attr"`
+	PresentationTime int64  `xml:"presentationTime,attr"`
+	Signal           *Signal `xml:"Signal"`
+}
+
+type Signal struct {
+	XMLNS  string `xml:"xmlns,attr"`
+	Binary Binary  `xml:"Binary"`
+}
+
+type Binary struct {
+	scte35.SCTE35
+}
+
+func (b *Binary) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+
+	value := base64.StdEncoding.EncodeToString(b.SCTE35.UpdateData())
+	return e.EncodeElement(value, start)
+}
+
+func (b *Binary) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+
+	var o string
+	if err := d.DecodeElement(&o, &start); err != nil {
+		return err
+	}
+
+	bytes, err := base64.StdEncoding.DecodeString(o)
+	if err != nil {
+		return err
+	}
+
+	bytes = append([]byte{0x00,}, bytes...)
+
+	marker, err := scte35.NewSCTE35(bytes)
+
+	b.SCTE35 = marker
+
+	fmt.Println(marker.String())
+
+	return err
+}
+
+type EventStream struct {
+	SchemeIdUri *string  `xml:"schemeIdUri,attr"`
+	Value       *string  `xml:"value,attr,omitempty"`
+	Timescale   *int64   `xml:"timescale,attr"`
+	Events      []*Event `xml:"Event,omitempty"`
 }
 
 // ISO 23009-1-2014 5.3.7
@@ -105,7 +187,7 @@ type CommonAttributesAndElements struct {
 	MaxPlayoutRate            *string               `xml:"maxPlayoutRate,attr"`
 	ScanType                  *string               `xml:"scanType,attr"`
 	FramePacking              *DescriptorType       `xml:"framePacking,attr"`
-	AudioChannelConfiguration *DescriptorType       `xml:"audioChannelConfiguration,attr"`
+	AudioChannelConfiguration *DescriptorType       `xml:"AudioChannelConfiguration"`
 	ContentProtection         []ContentProtectioner `xml:"ContentProtection,omitempty"`
 	EssentialProperty         *DescriptorType       `xml:"essentialProperty,attr"`
 	SupplementalProperty      *DescriptorType       `xml:"supplmentalProperty,attr"`
@@ -119,10 +201,14 @@ type AdaptationSet struct {
 	SegmentAlignment  *bool                 `xml:"segmentAlignment,attr"`
 	Lang              *string               `xml:"lang,attr"`
 	Group             *string               `xml:"group,attr"`
+	ContentType       *string               `xml:"contentType,attr,omitempty"`
 	PAR               *string               `xml:"par,attr"`
 	MinBandwidth      *string               `xml:"minBandwidth,attr"`
 	MaxBandwidth      *string               `xml:"maxBandwidth,attr"`
 	MinWidth          *string               `xml:"minWidth,attr"`
+	MaxHeight         *string               `xml:"maxHeight,attr,omitempty"`
+	MinFrameRate      *string               `xml:"minFrameRate,attr,omitempty"`
+	MaxFrameRate      *string               `xml:"maxFrameRate,attr,omitempty"`
 	MaxWidth          *string               `xml:"maxWidth,attr"`
 	ContentProtection []ContentProtectioner `xml:"ContentProtection,omitempty"` // Common attribute, can be deprecated here
 	Roles             []*Role               `xml:"Role,omitempty"`
@@ -141,10 +227,14 @@ func (as *AdaptationSet) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 		SegmentAlignment  *bool                 `xml:"segmentAlignment,attr"`
 		Lang              *string               `xml:"lang,attr"`
 		Group             *string               `xml:"group,attr"`
+		ContentType       *string               `xml:"contentType,attr,omitempty"`
 		PAR               *string               `xml:"par,attr"`
 		MinBandwidth      *string               `xml:"minBandwidth,attr"`
 		MaxBandwidth      *string               `xml:"maxBandwidth,attr"`
 		MinWidth          *string               `xml:"minWidth,attr"`
+		MaxHeight         *string               `xml:"maxHeight,attr,omitempty"`
+		MinFrameRate      *string               `xml:"minFrameRate,attr,omitempty"`
+		MaxFrameRate      *string               `xml:"maxFrameRate,attr,omitempty"`
 		MaxWidth          *string               `xml:"maxWidth,attr"`
 		ContentProtection []ContentProtectioner `xml:"ContentProtection,omitempty"` // Common attribute, can be deprecated here
 		Roles             []*Role               `xml:"Role,omitempty"`
@@ -235,8 +325,15 @@ func (as *AdaptationSet) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 					return err
 				}
 				representations = append(representations, rp)
+			case "AudioChannelConfiguration":
+				acc := new(DescriptorType)
+				err = d.DecodeElement(acc, &tt)
+				if err != nil {
+					return err
+				}
+				adaptationSet.AudioChannelConfiguration = acc
 			default:
-				return errors.New("Unrecognized element in AdaptationSet")
+				return errors.New("Unrecognized element in AdaptationSet " + tt.Name.Local)
 			}
 		case xml.EndElement:
 			if tt == start.End() {
