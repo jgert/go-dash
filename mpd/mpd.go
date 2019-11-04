@@ -6,11 +6,11 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/Comcast/gots/scte35"
+	"github.com/jgert/gots/scte35"
 	"strings"
 	"time"
 
-	. "github.com/zencoder/go-dash/helpers/ptrs"
+	. "github.com/jgert/go-dash/helpers/ptrs"
 )
 
 // Type definition for DASH profiles
