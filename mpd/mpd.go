@@ -419,7 +419,7 @@ type PlayreadyContentProtectionMarshal struct {
 
 type WidevineContentProtectionMarshal struct {
 	ContentProtectionMarshal
-	PSSH *string `xml:"cenc:pssh,omitempty"`
+	PSSH *string `xml:"urn:mpeg:cenc:2013 cenc:pssh,omitempty"`
 }
 
 func (s ContentProtection) ContentProtected() {}
