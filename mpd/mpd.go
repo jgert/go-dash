@@ -33,21 +33,20 @@ const (
 )
 
 type MPD struct {
-	XMLNs                      *string `xml:"xmlns,attr"`
-	NSCENC                     *string `xml:"xmlns:cenc,attr"`
-	Profiles                   *string `xml:"profiles,attr"`
-	Type                       *string `xml:"type,attr"`
-	MediaPresentationDuration  *string `xml:"mediaPresentationDuration,attr"`
-	MinBufferTime              *string `xml:"minBufferTime,attr"`
-	AvailabilityStartTime      *string `xml:"availabilityStartTime,attr,omitempty"`
-	MinimumUpdatePeriod        *string `xml:"minimumUpdatePeriod,attr"`
-	PublishTime                *string `xml:"publishTime,attr"`
-	TimeShiftBufferDepth       *string `xml:"timeShiftBufferDepth,attr"`
-	MaxSegmentDuration         *string `xml:"maxSegmentDuration,attr"`
-	BaseURL                    string  `xml:"BaseURL,omitempty"`
-	ID                         *string `xml:"id,attr,omitempty"`
-	SuggestedPresentationDelay *string `xml:"suggestedPresentationDelay,attr,omitempty"`
-	period                     *Period
+	XMLNs                      *string     `xml:"xmlns,attr,omitempty"`
+	NSCENC                     *string     `xml:"xmlns:cenc,attr,omitempty"`
+	Profiles                   *string     `xml:"profiles,attr,omitempty"`
+	Type                       *string     `xml:"type,attr,omitempty"`
+	MediaPresentationDuration  *string     `xml:"mediaPresentationDuration,attr,omitempty"`
+	MinBufferTime              *string     `xml:"minBufferTime,attr,omitempty"`
+	AvailabilityStartTime      *string     `xml:"availabilityStartTime,attr,omitempty"`
+	MinimumUpdatePeriod        *string     `xml:"minimumUpdatePeriod,attr,omitempty"`
+	PublishTime                *string     `xml:"publishTime,attr,omitempty"`
+	TimeShiftBufferDepth       *string     `xml:"timeShiftBufferDepth,attr,omitempty"`
+	MaxSegmentDuration         *string     `xml:"maxSegmentDuration,attr,omitempty"`
+	BaseURL                    string      `xml:"BaseURL,omitempty"`
+	ID                         *string     `xml:"id,attr,omitempty"`
+	SuggestedPresentationDelay *string     `xml:"suggestedPresentationDelay,attr,omitempty"`
 	Periods                    []*Period   `xml:"Period,omitempty"`
 	UTCTiming                  *Descriptor `xml:"UTCTiming,omitempty"`
 }
