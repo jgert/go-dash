@@ -2,8 +2,8 @@ package mpd
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/zencoder/go-dash/helpers/require"
-	"github.com/zencoder/go-dash/helpers/testfixtures"
+	"github.com/jgert/go-dash/helpers/require"
+	"github.com/jgert/go-dash/helpers/testfixtures"
 	"testing"
 )
 
