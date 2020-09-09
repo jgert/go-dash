@@ -8,8 +8,8 @@ import (
 
 type Event struct {
 	ID               string  `xml:"id,attr"`
-	Duration         int64   `xml:"duration,attr"`
-	PresentationTime int64   `xml:"presentationTime,attr"`
+	Duration         uint64  `xml:"duration,attr"`
+	PresentationTime uint64  `xml:"presentationTime,attr"`
 	Signal           *Signal `xml:"Signal"`
 }
 
