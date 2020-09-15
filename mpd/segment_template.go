@@ -5,9 +5,9 @@ type SegmentTemplate struct {
 	AdaptationSet          *AdaptationSet   `xml:"-"`
 	SegmentTimeline        *SegmentTimeline `xml:"SegmentTimeline,omitempty"`
 	PresentationTimeOffset *uint64          `xml:"presentationTimeOffset,attr,omitempty"`
-	Duration               *int64           `xml:"duration,attr"`
+	Duration               *uint64          `xml:"duration,attr"`
 	Initialization         *string          `xml:"initialization,attr"`
 	Media                  *string          `xml:"media,attr"`
-	StartNumber            *int64           `xml:"startNumber,attr"`
-	Timescale              *int64           `xml:"timescale,attr"`
+	StartNumber            *uint64          `xml:"startNumber,attr"`
+	Timescale              *uint64          `xml:"timescale,attr"`
 }
