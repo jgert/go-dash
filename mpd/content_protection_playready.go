@@ -11,7 +11,7 @@ type ContentProtectionPlayready struct {
 	PSSH        *string `xml:"pssh,omitempty"`
 	PRO         *string `xml:"pro,omitempty"`
 	KID         *string `xml:"kid,omitempty"`
-	IsEncrypted *uint   `xml:"isEncrypted,omitempty"`
+	IsEncrypted *uint   `xml:"IsEncrypted,omitempty"`
 	IVSize      *uint   `xml:"IV_Size,omitempty"`
 }
 
@@ -56,6 +56,11 @@ func RemoveIndex(s []*xml.Attr, index int) []*xml.Attr {
 
 func (cp *ContentProtectionPlayready) asMarshal() ContentProtectionPlayreadyMarshal {
 
+	isEncrypted := "0"
+	if cp.IsEncrypted != nil {
+		isEncrypted = strconv.FormatUint(uint64(*cp.IsEncrypted), 10)
+	}
+
 	obj := ContentProtectionPlayreadyMarshal{
 		Descriptor: cp.Descriptor,
 		NSCENC:     ptrs.Strptr(CENC_XMLNS),
@@ -75,7 +80,7 @@ func (cp *ContentProtectionPlayready) asMarshal() ContentProtectionPlayreadyMars
 		},
 		IsEncrypted: &isEncryptedMarshal{
 			NS:          ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
-			IsEncrypted: ptrs.Strptr(strconv.Itoa(int(*cp.IsEncrypted))),
+			IsEncrypted: ptrs.Strptr(isEncrypted),
 		},
 		IVSize: &ivSizeMarshal{
 			NS:     ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
