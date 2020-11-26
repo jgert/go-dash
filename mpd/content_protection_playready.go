@@ -66,26 +66,34 @@ func (cp *ContentProtectionPlayready) asMarshal() ContentProtectionPlayreadyMars
 		NSCENC:     ptrs.Strptr(CENC_XMLNS),
 		NSMSPR:     ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
 		PSSH:       cp.PSSH,
-		//PRO:         cp.PRO,
-		//KID:         cp.KID,
-		//IsEncrypted: cp.IsEncrypted,
-		//IVSize:      cp.IVSize,
-		PRO: &proMarshal{
+	}
+
+	if cp.PRO != nil {
+		obj.PRO = &proMarshal{
 			NS:  ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
 			PRO: cp.PRO,
-		},
-		KID: &kidMarshal{
+		}
+	}
+
+	if cp.KID != nil {
+		obj.KID = &kidMarshal{
 			NS:  ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
 			KID: cp.KID,
-		},
-		IsEncrypted: &isEncryptedMarshal{
+		}
+	}
+
+	if cp.IsEncrypted != nil {
+		obj.IsEncrypted = &isEncryptedMarshal{
 			NS:          ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
 			IsEncrypted: ptrs.Strptr(isEncrypted),
-		},
-		IVSize: &ivSizeMarshal{
+		}
+	}
+
+	if cp.IVSize != nil {
+		obj.IVSize = &ivSizeMarshal{
 			NS:     ptrs.Strptr(CONTENT_PROTECTION_PLAYREADY_XMLNS),
 			IVSize: ptrs.Strptr(strconv.Itoa(int(*cp.IVSize))),
-		},
+		}
 	}
 
 	// remove cenc namespace from DescriptorAttributes
